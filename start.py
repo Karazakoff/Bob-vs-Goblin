@@ -5,6 +5,8 @@ clock = pygame.time.Clock()
 
 
 screen = pygame.display.set_mode((1000,680))
+
+
 pygame.display.set_caption("Zeka's 1st game! Wow! Wow! Wonderful")
 
 walk_right = [pygame.image.load('Pictures/R1.png'), pygame.image.load('Pictures/R2.png'), pygame.image.load('Pictures/R3.png'),
@@ -15,6 +17,10 @@ walk_left = [pygame.image.load('Pictures/L1.png'), pygame.image.load('Pictures/L
              pygame.image.load('Pictures/L4.png'), pygame.image.load('Pictures/L5.png'), pygame.image.load('Pictures/L6.png'),
              pygame.image.load('Pictures/L7.png'), pygame.image.load('Pictures/L8.png'), pygame.image.load('Pictures/L9.png')]
 
+#bullet_sound = pygame.mixer.Sound("musics/bullet.mp3")
+
+music = pygame.mixer.music.load('musics/music.mp3')
+pygame.mixer.music.play(-1)
 
 bg1 = pygame.image.load('Pictures/bg.jpg')
 char = pygame.image.load('Pictures/standing.png')
@@ -65,7 +71,24 @@ class player(object):
                 screen.blit(walk_left[0], (self.x, self.y))
 
         self.hit_box = (self.x + 17, self.y + 11, 29, 52)
-        pygame.draw.rect(screen, (255, 0, 0), self.hit_box, 2)
+        #pygame.draw.rect(screen, (255, 0, 0), self.hit_box, 2)
+
+    def hit(self):
+        self.x = 50
+        self.y = 580
+        self.walk_count = 0
+        font_1 = pygame.font.SysFont('comicsans', 150)
+        text = font_1.render('-10', 1, (255, 0, 0))
+        screen.blit(text, (500 - (text.get_width() / 2), 200))
+        pygame.display.update()
+        i = 0
+        while i < 300:
+            pygame.time.delay(10)
+            i += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    i = 301
+                    pygame.quit()
 
 
 class Projectile(object):
@@ -101,21 +124,26 @@ class Enemy(object):
         self.end = end
         self.path = [self.x, self.end]
         self.walk_count = 0
-        self.vel = 3
+        self.vel = 10
         self.hit_box = (self.x + 17, self.y + 2, 31, 57)
+        self.health = 10
+        self.visible = True
     def draw(self, screen):
         self.move()
-        if self.walk_count + 1 >= 33:
-            self.walk_count = 0
+        if self.visible:
+            if self.walk_count + 1 >= 33:
+                self.walk_count = 0
 
-        if self.vel > 0:
-            screen.blit(self.walk_right[self.walk_count // 3], (self.x , self.y))
-            self.walk_count = self.walk_count + 1
-        else:
-            screen.blit(self.walk_left[self.walk_count // 3], (self.x, self.y))
-            self.walk_count = self.walk_count + 1
-        self.hit_box = (self.x + 17, self.y + 2, 31, 57)
-        pygame.draw.rect(screen, (255, 0, 0), self.hit_box, 2)
+            if self.vel > 0:
+                screen.blit(self.walk_right[self.walk_count // 3], (self.x , self.y))
+                self.walk_count = self.walk_count + 1
+            else:
+                screen.blit(self.walk_left[self.walk_count // 3], (self.x, self.y))
+                self.walk_count = self.walk_count + 1
+            pygame.draw.rect(screen, (255, 0, 0), (self.hit_box[0], self.hit_box[1] - 20, 50, 10))
+            pygame.draw.rect(screen, (0, 128, 0), (self.hit_box[0], self.hit_box[1] - 20, 50 - (5 * (10 - self.health)), 10))
+            self.hit_box = (self.x + 17, self.y + 2, 31, 57)
+            #pygame.draw.rect(screen, (255, 0, 0), self.hit_box, 2)
     def move(self):
 
         if self.vel > 0:
@@ -132,29 +160,43 @@ class Enemy(object):
                 self.walk_count = 0
 
     def hit(self):
+        if self.health > 0:
+            self.health -= 1
+        else:
+            self.visible = False
         print("Ai Bashym !")
-        pass
 
 
 def redraw_game_window():
+    screen.blit(bg1, (0,0))
+    text = font.render('Score: ' + str(score), 1, (255, 0, 0))
     man.draw(screen)
+    screen.blit(text, (390, 10))
     goblin.draw(screen)
     for bullet in bullets:
         bullet.draw(screen)
 
     pygame.display.update()
 
+
+
 #         main loop
 
-
+font = pygame.font.SysFont('kariepulli', 30, True)
 man = player(50, 580, 64, 64)
-goblin = Enemy(50, 580, 64, 64, 950)
+goblin = Enemy(200, 580, 64, 64, 950)
 bullets = []
 shoot_loop = 0
+score = 0
 run = True
 while run:
 
     clock.tick(27)
+
+    if man.hit_box[1] < goblin.hit_box[1] + goblin.hit_box[3] and man.hit_box[1] + man.hit_box[3] > goblin.hit_box[1]:
+        if man.hit_box[0] + man.hit_box[2] > goblin.hit_box[0] and man.hit_box[0] < goblin.hit_box[0] + goblin.hit_box[2]:
+            man.hit()
+            score  = score - 10
 
     if shoot_loop > 0:
         shoot_loop += 1
@@ -169,6 +211,7 @@ while run:
         if bullet.y - bullet.radius < goblin.hit_box[1] + goblin.hit_box[3] and bullet.y + bullet.radius > goblin.hit_box[1]:
             if bullet.x + bullet.radius > goblin.hit_box[0] and bullet.x - bullet.radius < goblin.hit_box[0] + goblin.hit_box[2]:
                 goblin.hit()
+                score += 1
                 bullets.pop(bullets.index(bullet))
 
         if bullet.x < 1000 and bullet.x > 0:
