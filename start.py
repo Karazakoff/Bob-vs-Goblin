@@ -29,7 +29,7 @@ bg2 = pygame.image.load('Pictures/bg2.jpg')
 changer = [bg1, bg2]
 
 class player(object):
-    
+
     def __init__(self, x, y, w, h):
         self.x = x
         self.y = y
@@ -120,7 +120,7 @@ class Enemy(object):
                 pygame.image.load('Pictures/L7E.png'), pygame.image.load('Pictures/L8E.png'), pygame.image.load('Pictures/L9E.png'),
                 pygame.image.load('Pictures/L10E.png'), pygame.image.load('Pictures/L11E.png')]
 
-    def __init__(self, x, y, w, h, end):
+    def __init__(self, x, y, w, h, end, vel):
         self.x = x
         self.y = y
         self.w = w
@@ -128,7 +128,7 @@ class Enemy(object):
         self.end = end
         self.path = [self.x, self.end]
         self.walk_count = 0
-        self.vel = 10
+        self.vel = vel
         self.hit_box = (self.x + 17, self.y + 2, 31, 57)
         self.health = 10
         self.visible = True
@@ -190,7 +190,7 @@ def redraw_game_window():
 
 font = pygame.font.SysFont('kariepulli', 30, True)
 man = player(50, 580, 64, 64)
-goblin = Enemy(200, 580, 64, 64, 950)
+goblin = Enemy(200, 580, 64, 64, 950, 5)
 bullets = []
 shoot_loop = 0
 score = 0
@@ -203,7 +203,11 @@ while run:
             if man.hit_box[0] + man.hit_box[2] > goblin.hit_box[0] and man.hit_box[0] < goblin.hit_box[0] + goblin.hit_box[2]:
                 man.hit()
                 score  = score - 10
-
+    else:
+        speed = goblin.vel
+        del goblin
+        speed += 2
+        goblin = Enemy(200,580, 64, 64, 950, speed)
     if shoot_loop > 0:
         shoot_loop += 1
     if shoot_loop > 3:
@@ -231,7 +235,7 @@ while run:
             facing = -1
         else:
             facing = 1
-        if len(bullets) < 5:
+        if len(bullets) < 3:
             a = random.randrange(0, 255)
             b = random.randrange(0, 255)
             c = random.randrange(0, 255)
