@@ -1,13 +1,14 @@
 import pygame
 import random
-pygame.init()
-clock = pygame.time.Clock()
 
+
+pygame.init()
+
+clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode((1000,680))
 
-
-pygame.display.set_caption("Zeka's 1st game! Wow! Wow! Wonderful")
+pygame.display.set_caption("Mario")
 
 walk_right = [pygame.image.load('Pictures/R1.png'), pygame.image.load('Pictures/R2.png'), pygame.image.load('Pictures/R3.png'),
               pygame.image.load('Pictures/R4.png'),pygame.image.load('Pictures/R5.png'), pygame.image.load('Pictures/R6.png'),
@@ -28,6 +29,7 @@ bg2 = pygame.image.load('Pictures/bg2.jpg')
 changer = [bg1, bg2]
 
 class player(object):
+    
     def __init__(self, x, y, w, h):
         self.x = x
         self.y = y
@@ -74,6 +76,8 @@ class player(object):
         #pygame.draw.rect(screen, (255, 0, 0), self.hit_box, 2)
 
     def hit(self):
+        self.jump_count = 10
+        self.is_jump = False
         self.x = 50
         self.y = 580
         self.walk_count = 0
@@ -143,6 +147,8 @@ class Enemy(object):
             pygame.draw.rect(screen, (255, 0, 0), (self.hit_box[0], self.hit_box[1] - 20, 50, 10))
             pygame.draw.rect(screen, (0, 128, 0), (self.hit_box[0], self.hit_box[1] - 20, 50 - (5 * (10 - self.health)), 10))
             self.hit_box = (self.x + 17, self.y + 2, 31, 57)
+        else:
+            self.hit_box = (0,0,1,1)
             #pygame.draw.rect(screen, (255, 0, 0), self.hit_box, 2)
     def move(self):
 
@@ -164,7 +170,7 @@ class Enemy(object):
             self.health -= 1
         else:
             self.visible = False
-        print("Ai Bashym !")
+        print("I can feel it")
 
 
 def redraw_game_window():
@@ -192,11 +198,11 @@ run = True
 while run:
 
     clock.tick(27)
-
-    if man.hit_box[1] < goblin.hit_box[1] + goblin.hit_box[3] and man.hit_box[1] + man.hit_box[3] > goblin.hit_box[1]:
-        if man.hit_box[0] + man.hit_box[2] > goblin.hit_box[0] and man.hit_box[0] < goblin.hit_box[0] + goblin.hit_box[2]:
-            man.hit()
-            score  = score - 10
+    if goblin.visible == True:
+        if man.hit_box[1] < goblin.hit_box[1] + goblin.hit_box[3] and man.hit_box[1] + man.hit_box[3] > goblin.hit_box[1]:
+            if man.hit_box[0] + man.hit_box[2] > goblin.hit_box[0] and man.hit_box[0] < goblin.hit_box[0] + goblin.hit_box[2]:
+                man.hit()
+                score  = score - 10
 
     if shoot_loop > 0:
         shoot_loop += 1
@@ -206,18 +212,17 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-
     for bullet in bullets:
-        if bullet.y - bullet.radius < goblin.hit_box[1] + goblin.hit_box[3] and bullet.y + bullet.radius > goblin.hit_box[1]:
-            if bullet.x + bullet.radius > goblin.hit_box[0] and bullet.x - bullet.radius < goblin.hit_box[0] + goblin.hit_box[2]:
-                goblin.hit()
-                score += 1
-                bullets.pop(bullets.index(bullet))
+            if bullet.y - bullet.radius < goblin.hit_box[1] + goblin.hit_box[3] and bullet.y + bullet.radius > goblin.hit_box[1]:
+                if bullet.x + bullet.radius > goblin.hit_box[0] and bullet.x - bullet.radius < goblin.hit_box[0] + goblin.hit_box[2]:
+                    goblin.hit()
+                    score += 1
+                    bullets.pop(bullets.index(bullet))
 
-        if bullet.x < 1000 and bullet.x > 0:
-            bullet.x = bullet.x + bullet.vel
-        else:
-            bullets.pop(bullets.index(bullet))
+            if bullet.x < 1000 and bullet.x > 0:
+                bullet.x = bullet.x + bullet.vel
+            else:
+                bullets.pop(bullets.index(bullet))
 
     keys = pygame.key.get_pressed()
 
