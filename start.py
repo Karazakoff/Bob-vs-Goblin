@@ -8,7 +8,7 @@ clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode((1000,680))
 
-pygame.display.set_caption("Mario")
+pygame.display.set_caption("Kill the Goblin")
 
 walk_right = [pygame.image.load('Pictures/R1.png'), pygame.image.load('Pictures/R2.png'), pygame.image.load('Pictures/R3.png'),
               pygame.image.load('Pictures/R4.png'),pygame.image.load('Pictures/R5.png'), pygame.image.load('Pictures/R6.png'),
