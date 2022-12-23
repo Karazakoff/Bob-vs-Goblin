@@ -21,9 +21,6 @@ pip3 install pygame
 ```
 Clone the repository:
 ```bash
-git init
-```
-```bash
 git clone https://github.com/Karazakoff/PyGame.git
 ```
 
