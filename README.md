@@ -35,7 +35,7 @@ python3 start.py
 ```
 _We recommend you turn off the volume because there are no options in-game to make your voice lower._
 
-After executing the script above, use:
+After executing the command above, use:
 
 **W** - To jump
 
